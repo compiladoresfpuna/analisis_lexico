@@ -11,7 +11,7 @@ int consumir;
 char cad[5*TAMLEX];
 token t;
 
-FILE *archivo; // Fuente JSON 
+FILE *archivo; // Fuente JSON
 char buff[2*TAMBUFF];	// Buffer para lectura de archivo fuente
 char id[TAMLEX];		// Utilizado por el analizador lexico
 int delantero=-1;		// Utilizado por el analizador lexico
@@ -38,7 +38,7 @@ void anaLex()
 	{
 		remove("output.txt");
 		freopen("output.txt", "a",stdout); // crea el archivo de salida output.txt
-		
+
 		if (c==' '){
 			printf(" ");	//imprimir espacios en blanco
 		}
@@ -285,38 +285,26 @@ void anaLex()
 				c=fgetc(archivo);
 				if (c=='\"')
 				{
-					c=fgetc(archivo);
-					if (c=='\"')
-					{
-						id[i]=c;
-						i++;
-						id[i]=c;
-						i++;
-					}
-					else
-					{
-						id[i]='\"';
-						i++;
-						break;
-					}
+                    break;
 				}
 				else if((c==EOF) || (c=='\n'))
 				{
 					error(msg);
-                    anaLex();
                     break;
 				}else{
 					id[i]=c;
 					i++;
 				}
-			}while(!(c=='\"') || !(c=='\n'));
+			}while(!(c=='\"') || (c!='\n'));
 			id[i]='\0';
-			if (c!=EOF)
+			if ((c!=EOF) && (c!='\"')){
 				ungetc(c,archivo);
-			else
-				c=0;
-			t.pe=buscar(id);
-			t.compLex=t.pe->compLex;
+                anaLex();
+			}
+			if (c=='\"'){
+                t.pe=buscar(id);
+                t.compLex=t.pe->compLex;
+			}
 			if (t.pe->compLex==-1)
 			{
 				strcpy(e.lexema,id);
